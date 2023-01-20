@@ -1,0 +1,27 @@
+coverage==5.5
+fastapi==0.68.1
+starlette==0.14.2
+uvicorn==0.13.4
+freezegun==1.1.0
+jaeger-client>=4.1.0
+opentracing==2.3.0
+opentracing-instrumentation==3.2.1
+pydantic==1.9.0
+psycopg2-binary==2.9.1
+# psycopg2==2.9.2
+pylint==2.10.2
+python-dotenv==0.12.0
+sqlalchemy==1.4.23
+jsonmerge==1.7.0
+pympler==1.0.1
+pytz==2021.3
+redis==2.10.6
+alembic==1.7.6
+
+# test requirements
+pytest==6.2.5
+pytest-env==0.6.2
+pytest-cov==2.12.1
+pytest-asyncio==0.14.0
+
+

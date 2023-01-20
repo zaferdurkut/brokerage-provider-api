@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - /var/lib/postgresql/data
+
+  application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: /bin/sh -c "/application_start.sh"
+    restart: always
+    ports:
+      - "8000:80"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+
+  redis:
+    restart: always
+    image: redis:5.0.7
+    ports:
+      - "6379:6379"
+    volumes:
+      - .data/db:/data
