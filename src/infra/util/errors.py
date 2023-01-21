@@ -7,4 +7,6 @@ errors = {
     1300: "Infra Exceptions",
     1999: "Unhandled error",
     2000: "Queue connection lost",
+    2001: "Unexpected error for Queue",
+    2002: "Publish event unexpected error for OrderEventProducer",
 }

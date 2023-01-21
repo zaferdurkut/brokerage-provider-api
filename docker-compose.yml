@@ -26,7 +26,7 @@ services:
       - .env
     volumes:
       - .:/app
-    command: bash -c "python -u src/infra/adapter/consumer/order/order_consumer.py"
+    command: bash -c "python -u src/infra/adapter/consumer/kafka/order/order_consumer.py"
 #    command: bash -c "tail -f /dev/null"
     depends_on:
       - kafka
@@ -41,7 +41,7 @@ services:
       - .env
     volumes:
       - .:/app
-    command: bash -c "python -u src/infra/adapter/consumer/notification/notification_consumer.py"
+    command: bash -c "python -u src/infra/adapter/consumer/kafka/notification/notification_consumer.py"
 #    command: bash -c "tail -f /dev/null"
     depends_on:
       - kafka
@@ -78,6 +78,7 @@ services:
     restart: always
     ports:
       - "9092:9092"
+      - '29092:29092'
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -85,6 +86,14 @@ services:
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_CREATE_TOPICS: "orders:1:1,notifications:1:1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,PLAINTEXT_HOST://:29092"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092"
+#      KAFKA_LOG4J_LOGGERS: >-
+#        kafka.controller=INFO,
+#        kafka.producer.async.DefaultEventHandler=INFO,
+#        state.change.logger=INFO
     volumes:
       - ./.docker/kafka/var/run/docker.sock:/var/run/docker.sock
     links:

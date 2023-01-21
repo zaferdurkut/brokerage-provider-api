@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Request, Depends
-from fastapi import Header
 from opentracing import Format
 from opentracing.ext import tags
-from pydantic import constr
 from starlette import status
 from starlette.responses import Response
 

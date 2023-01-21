@@ -1,4 +1,3 @@
-import logging
 import time
 import uuid
 
@@ -6,12 +5,15 @@ from fastapi import Request, Response
 
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from src.infra.config.logging_config import get_logger
 from src.infra.util.constants import TRACE_ID_FIELD_NAME
 
 LOG_MIDDLEWARE_IS_ENABLED = True
 LOG_TRACE_ID_HEADER_NAME = "TRACE-ID"
 LOG_IS_ENABLED = True
 TRACE_ID_REF = None
+
+logger = get_logger()
 
 
 def setup_trace_id(ref):
@@ -86,7 +88,7 @@ class RequestResponseMiddleware(BaseHTTPMiddleware):
 
         if http_status_code >= 400:
             if http_status_code >= 500:
-                logging.critical(
+                logger.critical(
                     str.format(
                         log_template,
                         request.url.path,
@@ -97,7 +99,7 @@ class RequestResponseMiddleware(BaseHTTPMiddleware):
                     log_data,
                 )
             else:
-                logging.error(
+                logger.error(
                     str.format(
                         log_template,
                         request.url.path,
@@ -109,7 +111,7 @@ class RequestResponseMiddleware(BaseHTTPMiddleware):
                 )
         else:
             if str.endswith(request.url.path, "/health-check") is False:
-                logging.info(
+                logger.info(
                     str.format(
                         log_template,
                         request.url.path,

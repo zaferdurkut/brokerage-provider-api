@@ -1,4 +1,3 @@
-import logging
 import traceback
 from typing import Dict, Optional
 
@@ -9,15 +8,18 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 from src.api.handler.error_response import ErrorResponse
+from src.infra.config.logging_config import get_logger
 from src.infra.exception.bad_request_exception import BadRequestException
 from src.infra.exception.infra_exception import InfraException
 from src.infra.exception.not_found_exception import NotFoundException
 from src.infra.util.errors import errors
 
+logger = get_logger()
+
 
 def unhandled_exception_handler(request, exc: Exception):
     error_code = 1999
-    logging.error(generate_error_message(error_code), generate_stack_trace(exc))
+    logger.error(generate_error_message(error_code), generate_stack_trace(exc))
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=generate_error_content(error_code=error_code),
@@ -36,7 +38,7 @@ def http_exception_handler_manual(exc: HTTPException):
     if status.HTTP_422_UNPROCESSABLE_ENTITY == exc.status_code:
         error_code = 1999
 
-    logging.error(generate_error_message(error_code), exc)
+    logger.error(generate_error_message(error_code), exc)
 
     return JSONResponse(
         status_code=exc.status_code,
@@ -55,7 +57,7 @@ def http_exception_handler(request, exc: HTTPException):
     if status.HTTP_403_FORBIDDEN == exc.status_code:
         error_code = 1201
 
-    logging.error(generate_error_message(error_code), generate_stack_trace(exc))
+    logger.error(generate_error_message(error_code), generate_stack_trace(exc))
 
     return JSONResponse(
         status_code=exc.status_code,
@@ -69,7 +71,7 @@ def http_exception_handler(request, exc: HTTPException):
 
 def validation_exception_handler(request, exc: RequestValidationError):
     error_code = 1000
-    logging.error(msg=generate_error_message(error_code))
+    logger.error(msg=generate_error_message(error_code))
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content=generate_error_content(
@@ -79,7 +81,7 @@ def validation_exception_handler(request, exc: RequestValidationError):
 
 
 def not_found_exception_handler(request, exc: NotFoundException):
-    logging.error(generate_error_message(exc.error_code))
+    logger.error(generate_error_message(exc.error_code))
     return generate_json_response(
         status_code=status.HTTP_404_NOT_FOUND,
         error_code=exc.error_code,
@@ -88,7 +90,7 @@ def not_found_exception_handler(request, exc: NotFoundException):
 
 
 def bad_request_exception_handler(request, exc: BadRequestException):
-    logging.error(
+    logger.error(
         generate_error_message(exc.error_code),
         generate_stack_trace(exc.cause_exception)
         if exc.cause_exception is not None
@@ -102,7 +104,7 @@ def bad_request_exception_handler(request, exc: BadRequestException):
 
 
 def infra_exception_handler(request, exc: InfraException):
-    logging.error(
+    logger.error(
         generate_error_message(exc.error_code),
         generate_stack_trace(exc.cause_exception)
         if exc.cause_exception is not None

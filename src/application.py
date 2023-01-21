@@ -4,6 +4,7 @@ from starlette.exceptions import HTTPException
 
 from src.api.controller.health_check import health_check_controller
 from src.api.controller.user import user_controller
+from src.api.controller.order import order_controller
 from src.api.handler.exception_handler import (
     http_exception_handler,
     validation_exception_handler,
@@ -44,6 +45,12 @@ def create_app():
         user_controller.router,
         prefix="/api/v1/users",
         tags=["user"],
+    )
+
+    app.include_router(
+        order_controller.router,
+        prefix="/api/v1/orders",
+        tags=["order"],
     )
 
     return app
