@@ -189,3 +189,4 @@ gcloud-service-key.json
 .mypy_cache
 .pytest_cache
 coverage-reports
+.docker

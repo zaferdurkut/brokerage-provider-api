@@ -6,4 +6,5 @@ errors = {
     1201: "Permission Denied",
     1300: "Infra Exceptions",
     1999: "Unhandled error",
+    2000: "Queue connection lost",
 }

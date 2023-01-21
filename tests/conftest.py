@@ -2,7 +2,7 @@ import pytest
 from starlette.testclient import TestClient
 
 from main import app
-from src.core.service.user_service import UserService
+from src.core.service.user.user_service import UserService
 from src.infra.adapter.repository.postgres.user_repository import UserRepository
 
 
