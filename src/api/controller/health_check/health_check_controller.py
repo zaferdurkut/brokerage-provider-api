@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/healthcheck",
+    "/health-check",
     response_model=HealthCheckOutputDto,
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_200_OK: {"model": HealthCheckOutputDto}},

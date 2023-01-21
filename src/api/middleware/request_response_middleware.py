@@ -108,7 +108,7 @@ class RequestResponseMiddleware(BaseHTTPMiddleware):
                     log_data,
                 )
         else:
-            if str.endswith(request.url.path, "/healthcheck") is False:
+            if str.endswith(request.url.path, "/health-check") is False:
                 logging.info(
                     str.format(
                         log_template,

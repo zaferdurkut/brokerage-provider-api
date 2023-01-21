@@ -190,3 +190,5 @@ gcloud-service-key.json
 .pytest_cache
 coverage-reports
 .docker
+.prometheus-data
+.grafana-data

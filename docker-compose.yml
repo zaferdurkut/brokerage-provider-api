@@ -20,13 +20,13 @@ services:
   order_consumer:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: consumer.Dockerfile
     restart: always
     env_file:
       - .env
     volumes:
       - .:/app
-    command: bash -c "python -u src/core/service/order_consumer/order_consumer.py"
+    command: bash -c "python -u src/infra/adapter/consumer/order/order_consumer.py"
 #    command: bash -c "tail -f /dev/null"
     depends_on:
       - kafka
@@ -35,13 +35,13 @@ services:
   notification_consumer:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: consumer.Dockerfile
     restart: always
     env_file:
       - .env
     volumes:
       - .:/app
-    command: bash -c "python -u src/core/service/notification_consumer/notification_consumer.py"
+    command: bash -c "python -u src/infra/adapter/consumer/notification/notification_consumer.py"
 #    command: bash -c "tail -f /dev/null"
     depends_on:
       - kafka
@@ -113,3 +113,24 @@ services:
       - "16686:16686"
     depends_on:
       - application
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - .prometheus-data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - .grafana-data:/var/lib/grafana
+      - ./datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
