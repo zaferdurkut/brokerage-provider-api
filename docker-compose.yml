@@ -57,6 +57,7 @@ services:
       - "5432:5432"
     volumes:
       - /var/lib/postgresql/data
+      - ./resources/docker-entrypoint-initdb:/docker-entrypoint-initdb.d/
 
   redis:
     restart: always

@@ -4,15 +4,17 @@ from opentracing.ext import tags
 from starlette import status
 from starlette.responses import Response
 
+from src.api.controller.order.dto.create_order_output_dto import CreateOrderOutputDto
 from src.api.controller.service_resolver import (
     get_order_service,
 )
-from src.api.controller.order.dto.order_event_input_dto import CreateOrderInputDto
+from src.api.controller.order.dto.create_order_input_dto import CreateOrderInputDto
 from src.api.handler.error_response import (
     generate_validation_error_response,
     ErrorResponse,
     generate_error_response,
 )
+from src.core.model.order.create_order_output_model import CreateOrderOutputModel
 from src.core.model.order.order_event_input_model import CreateOrderInputModel
 from src.infra.config.open_tracing_config import tracer
 
@@ -21,15 +23,15 @@ router = APIRouter()
 
 @router.post(
     "",
-    response_model=None,
+    response_model=CreateOrderOutputDto,
     status_code=status.HTTP_201_CREATED,
     response_model_exclude_none=True,
     responses={
-        status.HTTP_201_CREATED: {"model": None},
+        status.HTTP_201_CREATED: {"model": CreateOrderOutputDto},
         status.HTTP_400_BAD_REQUEST: {
             "model": ErrorResponse,
             "content": generate_validation_error_response(
-                invalid_field_location=["page", "page_size"]
+                invalid_field_location=["body", "amount"]
             ),
         },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
@@ -53,9 +55,9 @@ def create_order(
         tags=span_tags,
     ) as scope:
         try:
-            order_service.create_order(
+            order_output_model: CreateOrderOutputModel = order_service.create_order(
                 order_event_input_model=CreateOrderInputModel(**order_input_dto.dict())
             )
-            return Response(status_code=status.HTTP_201_CREATED)
+            return CreateOrderOutputDto(**order_output_model.dict())
         finally:
             scope.close()

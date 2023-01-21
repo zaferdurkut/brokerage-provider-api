@@ -15,7 +15,7 @@ DATABASE_URL = config("DATABASE_URL")
 # Redis
 REDIS_HOST = config("REDIS_HOST")
 REDIS_PORT = config("REDIS_PORT")
-REDIS_DB = config("REDIS_DB")
+REDIS_USER_DB = config("REDIS_USER_DB", int)
 
 # Kafka
 KAFKA_ORDER_TOPIC = config("KAFKA_ORDER_TOPIC")
