@@ -4,16 +4,16 @@ from opentracing.ext import tags
 from starlette import status
 from starlette.responses import Response
 
-from src.api.controller.order.dto.buy_order_input_dto import BuyOrderInputDto
 from src.api.controller.service_resolver import (
-    get_order_service,
+    get_stock_service,
 )
+from src.api.controller.stock.dto.create_stock_input_dto import CreateStockInputDto
 from src.api.handler.error_response import (
     generate_validation_error_response,
     ErrorResponse,
     generate_error_response,
 )
-from src.core.model.order.buy_order_input_model import BuyOrderInputModel
+from src.core.model.stock.create_stock_input_model import CreateStockInputModel
 from src.infra.config.open_tracing_config import tracer
 
 router = APIRouter()
@@ -29,7 +29,7 @@ router = APIRouter()
         status.HTTP_400_BAD_REQUEST: {
             "model": ErrorResponse,
             "content": generate_validation_error_response(
-                invalid_field_location=["body", "user_id"]
+                invalid_field_location=["body", "amount"]
             ),
         },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
@@ -38,10 +38,10 @@ router = APIRouter()
         },
     },
 )
-def buy_order(
+def create_stock(
     request: Request,
-    buy_order_input_dto: BuyOrderInputDto,
-    order_service=Depends(get_order_service),
+    stock_input_dto: CreateStockInputDto,
+    stock_service=Depends(get_stock_service),
 ):
     span_ctx = tracer.extract(Format.HTTP_HEADERS, request.headers)
     span_tags = {
@@ -53,8 +53,8 @@ def buy_order(
         tags=span_tags,
     ) as scope:
         try:
-            order_service.buy_order(
-                buy_order_input_model=BuyOrderInputModel(**buy_order_input_dto.dict())
+            stock_service.create_stock(
+                create_stock_input_model=CreateStockInputModel(**stock_input_dto.dict())
             )
             return Response(status_code=status.HTTP_202_ACCEPTED)
         finally:

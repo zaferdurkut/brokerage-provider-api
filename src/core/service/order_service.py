@@ -1,9 +1,8 @@
-import uuid
-
 from opentracing_instrumentation import get_current_span
 
-from src.core.model.order.create_order_output_model import CreateOrderOutputModel
-from src.core.model.order.order_event_input_model import CreateOrderInputModel
+from src.core.model.base_models.order_type import OrderTypeEnum
+from src.core.model.order.buy_order_input_model import BuyOrderInputModel
+from src.core.model.order.order_event_model import OrderEventModel
 from src.core.port.order_event_publish_port import OrderEventPublishPort
 from src.infra.config.open_tracing_config import tracer
 
@@ -15,18 +14,17 @@ class OrderService:
     ):
         self.order_event_publish_port = order_event_publish_port
 
-    def create_order(
-        self, order_event_input_model: CreateOrderInputModel
-    ) -> CreateOrderOutputModel:
+    def buy_order(self, buy_order_input_model: BuyOrderInputModel):
         with tracer.start_active_span(
-            "UserService-create_user",
+            "OrderService-buy_order",
             child_of=get_current_span(),
         ) as scope:
             scope.span.set_tag(
-                "order_event_input_model",
-                order_event_input_model,
+                "buy_order_input_model",
+                buy_order_input_model,
             )
             self.order_event_publish_port.create_order_event(
-                order_event_input_model=order_event_input_model
+                order_event_model=OrderEventModel(
+                    **buy_order_input_model.dict(), type=OrderTypeEnum.BUY
+                )
             )
-            return CreateOrderOutputModel(id=uuid.uuid4())

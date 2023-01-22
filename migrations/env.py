@@ -12,6 +12,11 @@ sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), ".."
 
 from src.infra.adapter.repository.postgres.repository_config import Base  # noqa: E402
 from src.infra.adapter.repository.postgres.entity.user_entity import UserEntity
+from src.infra.adapter.repository.postgres.entity.stock_entity import StockEntity
+from src.infra.adapter.repository.postgres.entity.user_stock_entity import (
+    UserStockEntity,
+)
+from src.infra.adapter.repository.postgres.entity.order_entity import OrderEntity
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

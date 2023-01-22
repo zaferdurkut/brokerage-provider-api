@@ -1,9 +1,6 @@
-from typing import Any
-
-from kafka.errors import KafkaError
 from opentracing_instrumentation import get_current_span
 
-from src.core.model.order.order_event_input_model import CreateOrderInputModel
+from src.core.model.order.order_event_model import OrderEventModel
 from src.infra.adapter.producer.producer_config import initialize_order_producer
 from src.infra.config.app_config import KAFKA_ORDER_TOPIC
 from src.infra.config.logging_config import get_logger
@@ -18,16 +15,16 @@ class OrderEventProducer:
         self.kafka_order_producer = initialize_order_producer()
         self.order_topic = KAFKA_ORDER_TOPIC
 
-    def create_order_event(self, order_event_input_model: CreateOrderInputModel):
+    def create_order_event(self, order_event_model: OrderEventModel):
         with tracer.start_active_span(
-            "OrderEventProducer-search",
+            "OrderEventProducer-create_order_event",
             child_of=get_current_span(),
         ) as scope:
             scope.span.set_tag(
-                "order_event_input_model",
-                order_event_input_model,
+                "order_event_model",
+                order_event_model,
             )
-            self._send(topic=self.order_topic, item=order_event_input_model.dict())
+            self._send(topic=self.order_topic, item=order_event_model.dict())
 
     def _send(self, topic: str, item: dict):
         """Connect to Kafka and  push message to Topic"""
