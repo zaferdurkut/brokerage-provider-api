@@ -9,4 +9,9 @@ errors = {
     2000: "Queue connection lost",
     2001: "Unexpected error for Queue",
     2002: "Publish event unexpected error for OrderEventProducer",
+    2003: "User with the given user id is not found",
+    2004: "Stock with the given stock symbol is already exists",
+    2005: "Stock with the given stock symbol is not found",
+    2006: "Stock amount with the given stock symbol does not enough for selling",
+    2007: "User balance with the given user id balance does not enough for selling",
 }

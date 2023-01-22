@@ -7,15 +7,13 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import String, Boolean
 
+from src.infra.adapter.repository.postgres.entity.base_entity import BaseEntity
 from src.infra.adapter.repository.postgres.repository_config import Base
 
 
-class StockEntity(Base):
+class StockEntity(Base, BaseEntity):
     __tablename__ = "stock"
     id = Column(UUID(as_uuid=True), default=uuid4)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, onupdate=datetime.utcnow)
-    deleted = Column(Boolean, default=False)
     amount = Column(Float, nullable=False)
     name = Column(String, nullable=False)
     symbol = Column(String, nullable=False, primary_key=True)
