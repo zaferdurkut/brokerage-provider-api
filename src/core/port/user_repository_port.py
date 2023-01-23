@@ -14,3 +14,6 @@ class UserRepositoryPort(Protocol):
 
     def get_user(self, user_id: UUID) -> GetUserOutputModel:
         ...
+
+    def check_user(self, user_id: UUID):
+        ...

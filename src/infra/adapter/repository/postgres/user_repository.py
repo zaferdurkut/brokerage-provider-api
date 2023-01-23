@@ -73,3 +73,22 @@ class UserRepository:
                         for stock_item in user_entity.user_stocks
                     ],
                 )
+
+    def check_user(self, user_id: UUID):
+        with tracer.start_active_span(
+            "UserRepository-check_user",
+            child_of=get_current_span(),
+        ) as scope:
+            scope.span.set_tag(
+                "user_id",
+                user_id,
+            )
+            with RepositoryManager() as repository_manager:
+                user_entity = (
+                    repository_manager.query(UserEntity)
+                    .filter(UserEntity.id == user_id)
+                    .filter(UserEntity.deleted.is_(False))
+                    .first()
+                )
+                if user_entity is None:
+                    raise NotFoundException(error_code=2003)

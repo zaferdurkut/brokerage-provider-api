@@ -19,6 +19,8 @@ def get_order_service():
     return OrderService(
         order_event_publish_port=get_order_event_publisher(),
         order_repository_port=get_order_repository(),
+        user_repository_port=get_user_repository(),
+        stock_repository_port=get_stock_repository(),
     )
 
 

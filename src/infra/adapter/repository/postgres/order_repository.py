@@ -107,7 +107,7 @@ class OrderRepository:
             )
 
             order_result_model = OrderRepositoryResultOutputModel(
-                status=OrderStatusEnum.WAITING
+                status=OrderStatusEnum.CANCELLED
             )
             with RepositoryManager() as repository_manager:
                 try:
@@ -131,10 +131,11 @@ class OrderRepository:
                     elif order_entity.status == OrderStatusEnum.CANCELLED:
                         order_result_model.error_code = 2014
 
-                    order_entity.error_code = order_result_model.error_code
-                    order_entity.status = order_result_model.status
-                    repository_manager.merge(order_entity)
-                    repository_manager.commit()
+                    if order_result_model.error_code is None:
+                        order_entity.error_code = order_result_model.error_code
+                        order_entity.status = order_result_model.status
+                        repository_manager.merge(order_entity)
+                        repository_manager.commit()
 
                 except NotFoundException as exc:
                     logger.error(str(exc))

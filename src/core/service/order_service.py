@@ -11,6 +11,8 @@ from src.core.model.order.order_event_model import OrderEventModel
 from src.core.model.order.sell_order_input_model import SellOrderInputModel
 from src.core.port.order_event_publish_port import OrderEventPublishPort
 from src.core.port.order_repository_port import OrderRepositoryPort
+from src.core.port.stock_repository_port import StockRepositoryPort
+from src.core.port.user_repository_port import UserRepositoryPort
 from src.infra.config.open_tracing_config import tracer
 
 
@@ -19,9 +21,13 @@ class OrderService:
         self,
         order_event_publish_port: OrderEventPublishPort,
         order_repository_port: OrderRepositoryPort,
+        user_repository_port: UserRepositoryPort,
+        stock_repository_port: StockRepositoryPort,
     ):
         self.order_event_publish_port = order_event_publish_port
         self.order_repository_port = order_repository_port
+        self.user_repository_port = user_repository_port
+        self.stock_repository_port = stock_repository_port
 
     def buy_order(self, buy_order_input_model: BuyOrderInputModel):
         with tracer.start_active_span(
@@ -32,8 +38,13 @@ class OrderService:
                 "buy_order_input_model",
                 buy_order_input_model,
             )
-            # TODO: Add user control from database or redis
-            # TODO: Add stock control from database or redis
+            # TODO: Caching of user and stock
+            # TODO: Can move to Order Service
+            self.user_repository_port.check_user(user_id=buy_order_input_model.user_id)
+            self.stock_repository_port.check_stock(
+                stock_symbol=buy_order_input_model.stock_symbol
+            )
+
             self.order_event_publish_port.create_order_event(
                 order_event_model=OrderEventModel(
                     **buy_order_input_model.dict(), type=OrderTypeEnum.BUY
@@ -49,8 +60,13 @@ class OrderService:
                 "sell_order_input_model",
                 sell_order_input_model,
             )
-            # TODO: Add user control from database or redis
-            # TODO: Add stock control from database or redis
+            # TODO: Caching of user and stock
+            # TODO: Can move to Order Service
+            self.user_repository_port.check_user(user_id=sell_order_input_model.user_id)
+            self.stock_repository_port.check_stock(
+                stock_symbol=sell_order_input_model.stock_symbol
+            )
+
             self.order_event_publish_port.create_order_event(
                 order_event_model=OrderEventModel(
                     **sell_order_input_model.dict(), type=OrderTypeEnum.SELL
@@ -66,8 +82,7 @@ class OrderService:
                 "cancel_order_input_model",
                 cancel_order_input_model,
             )
-            # TODO: Add order control from database or redis
-            # TODO: Add stock control from database or redis
+
             self.order_event_publish_port.create_order_event(
                 order_event_model=OrderEventModel(
                     **cancel_order_input_model.dict(), type=OrderTypeEnum.CANCEL

@@ -19,7 +19,8 @@ logger = get_logger()
 
 def unhandled_exception_handler(request, exc: Exception):
     error_code = 1999
-    logger.error(generate_error_message(error_code), generate_stack_trace(exc))
+    logger.error(generate_error_message(error_code))
+    logger.error(generate_stack_trace(exc))
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=generate_error_content(error_code=error_code),
@@ -57,7 +58,8 @@ def http_exception_handler(request, exc: HTTPException):
     if status.HTTP_403_FORBIDDEN == exc.status_code:
         error_code = 1201
 
-    logger.error(generate_error_message(error_code), generate_stack_trace(exc))
+    logger.error(generate_error_message(error_code))
+    logger.error(generate_stack_trace(exc))
 
     return JSONResponse(
         status_code=exc.status_code,
@@ -92,9 +94,11 @@ def not_found_exception_handler(request, exc: NotFoundException):
 def bad_request_exception_handler(request, exc: BadRequestException):
     logger.error(
         generate_error_message(exc.error_code),
+    )
+    logger.error(
         generate_stack_trace(exc.cause_exception)
         if exc.cause_exception is not None
-        else {},
+        else "",
     )
     return generate_json_response(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -106,9 +110,11 @@ def bad_request_exception_handler(request, exc: BadRequestException):
 def infra_exception_handler(request, exc: InfraException):
     logger.error(
         generate_error_message(exc.error_code),
+    )
+    logger.error(
         generate_stack_trace(exc.cause_exception)
         if exc.cause_exception is not None
-        else {},
+        else "",
     )
     return generate_json_response(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

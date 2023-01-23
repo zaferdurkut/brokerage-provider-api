@@ -67,7 +67,7 @@ def create_user(
 
 
 @router.get(
-    "",
+    "/{user_id}",
     response_model=GetUserOutputDto,
     status_code=status.HTTP_200_OK,
     response_model_exclude_none=True,
