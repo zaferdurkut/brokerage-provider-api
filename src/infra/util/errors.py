@@ -14,4 +14,11 @@ errors = {
     2005: "Stock with the given stock symbol is not found",
     2006: "Stock amount with the given stock symbol does not enough for selling",
     2007: "User balance with the given user id balance does not enough for selling",
+    2008: "Unexpected error for creating buy order",
+    2009: "Unexpected error for creating sell order",
+    2010: "Unexpected error for cancel sell order",
+    2011: "Order with the given order id is not found",
+    2012: "Order cancel request did not complete with the given order id because of the order was completed",
+    2013: "Order cancel request did not complete with the given order id because of the order was failed",
+    2014: "Order cancel request did not complete with the given order id because of the order was canceled",
 }

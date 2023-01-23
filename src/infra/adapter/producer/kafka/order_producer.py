@@ -1,3 +1,5 @@
+import json
+
 from opentracing_instrumentation import get_current_span
 
 from src.core.model.order.order_event_model import OrderEventModel
@@ -24,7 +26,9 @@ class OrderEventProducer:
                 "order_event_model",
                 order_event_model,
             )
-            self._send(topic=self.order_topic, item=order_event_model.dict())
+            self._send(
+                topic=self.order_topic, item=json.loads(order_event_model.json())
+            )
 
     def _send(self, topic: str, item: dict):
         """Connect to Kafka and  push message to Topic"""

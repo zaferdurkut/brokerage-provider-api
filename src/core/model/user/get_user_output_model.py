@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
 
@@ -16,6 +17,7 @@ class GetUserStockOutputModel(BaseModel):
 
 class GetUserOrderOutputModel(BaseModel):
     id: UUID
+    created_at: datetime
     price: Optional[float]
     amount: Optional[float]
     stock_symbol: str

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, List
 from uuid import UUID, uuid4
 
@@ -16,9 +17,10 @@ class GetUserStockOutputDto(BaseModel):
 
 class GetUserOrderOutputDto(BaseModel):
     id: UUID = Field(..., example=uuid4())
+    created_at: datetime = Field(..., example=datetime.utcnow())
     price: float = Field(..., example=110.123)
     amount: float = Field(..., example=11.123)
-    stock_symbol: str = Field(..., example="APPL")
+    stock_symbol: str = Field(..., example="AAPL")
     type: OrderTypeEnum = Field(..., example=OrderTypeEnum.BUY)
     status: OrderStatusEnum = Field(..., example=OrderStatusEnum.COMPLETED)
 

@@ -59,12 +59,15 @@ class UserRepository:
                 if user_entity is None:
                     raise NotFoundException(error_code=2003)
 
+                orders = [
+                    GetUserOrderOutputModel(**order_item.__dict__)
+                    for order_item in user_entity.user_orders
+                ]
+                orders = sorted(orders, key=lambda x: x.created_at, reverse=True)
+
                 return GetUserOutputModel(
                     **user_entity.__dict__,
-                    orders=[
-                        GetUserOrderOutputModel(**order_item.__dict__)
-                        for order_item in user_entity.user_orders
-                    ],
+                    orders=orders,
                     stocks=[
                         GetUserStockOutputModel(**stock_item.__dict__)
                         for stock_item in user_entity.user_stocks

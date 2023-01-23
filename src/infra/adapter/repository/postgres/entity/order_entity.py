@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, ForeignKey
+from sqlalchemy import Column, String, Float, ForeignKey, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -17,6 +17,7 @@ class OrderEntity(Base, BaseEntity):
     amount = Column(Float, nullable=False)
     type = Column(String, nullable=False)
     status = Column(String, nullable=False, default=OrderStatusEnum.WAITING.value)
+    error_code = Column(Integer, nullable=True)
 
     user = relationship(UserEntity, back_populates="user_orders")
     stock = relationship(StockEntity, back_populates="stock_orders")

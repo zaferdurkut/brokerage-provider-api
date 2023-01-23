@@ -10,6 +10,6 @@ class OrderEventModel(BaseModel):
     order_id: Optional[UUID]
     price: Optional[float]
     amount: Optional[float]
-    stock_symbol: str
+    stock_symbol: Optional[str]
     type: OrderTypeEnum
-    user_id: UUID
+    user_id: Optional[UUID]

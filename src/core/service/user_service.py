@@ -40,4 +40,5 @@ class UserService:
                 "user_id",
                 user_id,
             )
+            # TODO: Redis should implement for getting data
             return self.user_repository_port.get_user(user_id=user_id)
