@@ -72,6 +72,20 @@ class TestOrderRepositoryPostgresAdapter:
             assert order_entity.status == OrderStatusEnum.WAITING
             assert order_entity.error_code is None
 
+        # given
+        buy_order_input_dto.amount = 100000
+
+        # when
+        buy_order_output_model: OrderRepositoryResultOutputModel = (
+            order_repository_postgres_adapter.buy_order(
+                buy_order_input_model=BuyOrderInputModel(**buy_order_input_dto.dict())
+            )
+        )
+
+        # then
+        assert buy_order_output_model.error_code == 2006
+        assert buy_order_output_model.status == OrderStatusEnum.FAILED
+
     def test_should_sell_order(self, test_client, order_repository_postgres_adapter):
         # given
         user_id, stock_symbol = populate_user_id_and_stock(test_client)
@@ -107,6 +121,22 @@ class TestOrderRepositoryPostgresAdapter:
             assert order_entity.type == OrderTypeEnum.SELL
             assert order_entity.status == OrderStatusEnum.WAITING
             assert order_entity.error_code is None
+
+        # given
+        sell_order_input_dto.amount = 55
+
+        # when
+        sell_order_output_model: OrderRepositoryResultOutputModel = (
+            order_repository_postgres_adapter.sell_order(
+                sell_order_input_model=SellOrderInputModel(
+                    **sell_order_input_dto.dict()
+                )
+            )
+        )
+
+        # then
+        assert sell_order_output_model.error_code == 2007
+        assert sell_order_output_model.status == OrderStatusEnum.FAILED
 
     def test_should_cancel_order(self, test_client, order_repository_postgres_adapter):
         # given

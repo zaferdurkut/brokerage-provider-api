@@ -23,23 +23,19 @@ def delete_all_tables():
 
 def populate_create_user_dto():
     return CreateUserInputDto(
-        name="test", surname="test", email="test@test.com", balance=1234
+        name="test", surname="test", email="test@test.com", balance=10000
     )
 
 
 def populate_create_stock_dto():
     return CreateStockInputDto(
-        name="Apple", symbol="AAPL", first_price=123.23, currency="USD", amount=100
+        name="Apple", symbol="AAPL", first_price=150.1, currency="USD", amount=100
     )
 
 
 def populate_buy_order_dto():
-    return BuyOrderInputDto(
-        user_id=uuid4(), price=1000, amount=123.23, stock_symbol="AAPL"
-    )
+    return BuyOrderInputDto(user_id=uuid4(), price=100, amount=15, stock_symbol="AAPL")
 
 
 def populate_sell_order_dto():
-    return SellOrderInputDto(
-        user_id=uuid4(), price=1000, amount=123.23, stock_symbol="AAPL"
-    )
+    return SellOrderInputDto(user_id=uuid4(), price=100, amount=5, stock_symbol="AAPL")

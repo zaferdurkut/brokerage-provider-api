@@ -12,7 +12,7 @@ class GetUserStockOutputDto(BaseModel):
     id: UUID = Field(..., example=uuid4())
     amount: float = Field(..., example=10)
     stock_symbol: str = Field(..., example="AAPL")
-    price: float = Field(..., example=127.87)
+    total_price: float = Field(..., example=127.87)
 
 
 class GetUserOrderOutputDto(BaseModel):

@@ -12,7 +12,9 @@ from src.core.model.order.order_result_output_model import (
     OrderRepositoryResultOutputModel,
 )
 from src.core.model.order.sell_order_input_model import SellOrderInputModel
-from src.infra.adapter.repository.postgres.entity import OrderEntity
+from src.infra.adapter.repository.postgres.entity import OrderEntity, UserStockEntity
+from src.infra.adapter.repository.postgres.entity.stock_entity import StockEntity
+from src.infra.adapter.repository.postgres.entity.user_entity import UserEntity
 from src.infra.adapter.repository.postgres.repository_manager import RepositoryManager
 from src.infra.config.logging_config import get_logger
 from src.infra.config.open_tracing_config import tracer
@@ -47,6 +49,13 @@ class OrderRepository:
                         type=OrderTypeEnum.BUY,
                         status=OrderStatusEnum.WAITING,
                     )
+
+                    user_entity = self._get_user(user_id=buy_order_input_model.user_id)
+
+                    print(order_entity.amount, order_entity.price, user_entity.balance)
+                    if order_entity.amount * order_entity.price > user_entity.balance:
+                        order_result_model.status = OrderStatusEnum.FAILED
+                        order_result_model.error_code = 2006
 
                     order_entity.error_code = order_result_model.error_code
                     order_entity.status = order_result_model.status
@@ -83,6 +92,17 @@ class OrderRepository:
                         type=OrderTypeEnum.SELL,
                         status=OrderStatusEnum.WAITING,
                     )
+
+                    user_entity = self._get_user(user_id=sell_order_input_model.user_id)
+
+                    user_stock_amount = self._get_user_stock_amount(
+                        user_id=user_entity.id,
+                        stock_symbol=sell_order_input_model.stock_symbol,
+                    )
+                    print(order_entity.amount, user_stock_amount)
+                    if order_entity.amount > user_stock_amount:
+                        order_result_model.status = OrderStatusEnum.FAILED
+                        order_result_model.error_code = 2007
 
                     order_entity.error_code = order_result_model.error_code
                     order_entity.status = order_result_model.status
@@ -197,3 +217,29 @@ class OrderRepository:
                     raise NotFoundException(error_code=2011)
 
                 return GetOrderOutputModel(**order_entity.__dict__)
+
+    def _get_user(self, user_id: UUID) -> UserEntity:
+        with RepositoryManager() as repository_manager:
+            user_entity = (
+                repository_manager.query(UserEntity)
+                .filter(UserEntity.id == user_id)
+                .filter(UserEntity.deleted.is_(False))
+                .first()
+            )
+
+            return user_entity
+
+    def _get_user_stock_amount(self, user_id: UUID, stock_symbol: str) -> float:
+        with RepositoryManager() as repository_manager:
+            user_stock_entity = (
+                repository_manager.query(UserStockEntity)
+                .filter(UserStockEntity.user_id == user_id)
+                .filter(UserStockEntity.stock_symbol == stock_symbol)
+                .filter(UserStockEntity.deleted.is_(False))
+                .first()
+            )
+
+            if user_stock_entity is None:
+                return 0
+
+            return user_stock_entity.amount

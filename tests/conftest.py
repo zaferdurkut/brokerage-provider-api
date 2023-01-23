@@ -9,9 +9,6 @@ from src.core.service.user_service import UserService
 from src.infra.adapter.repository.postgres.order_repository import OrderRepository
 from src.infra.adapter.repository.postgres.stock_repository import StockRepository
 from src.infra.adapter.repository.postgres.user_repository import UserRepository
-from src.infra.adapter.repository.postgres.user_stock_repository import (
-    UserStockRepository,
-)
 
 
 @pytest.fixture(scope="session")
@@ -32,11 +29,6 @@ def order_repository_postgres_adapter():
 @pytest.fixture(scope="session")
 def stock_repository_postgres_adapter():
     return StockRepository()
-
-
-@pytest.fixture(scope="session")
-def user_stock_repository_postgres_adapter():
-    return UserStockRepository()
 
 
 @pytest.fixture(scope="session")

@@ -12,7 +12,7 @@ class GetUserStockOutputModel(BaseModel):
     id: UUID
     amount: float
     stock_symbol: str
-    price: float
+    total_price: float
 
 
 class GetUserOrderOutputModel(BaseModel):

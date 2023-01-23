@@ -18,3 +18,4 @@ class GetOrderOutputModel(BaseModel):
     stock_symbol: str
     type: OrderTypeEnum
     status: OrderStatusEnum
+    error_code: Optional[int]

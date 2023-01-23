@@ -10,10 +10,13 @@ from src.core.model.user.get_user_output_model import (
     GetUserOrderOutputModel,
     GetUserStockOutputModel,
 )
+from src.infra.adapter.repository.postgres.entity import UserStockEntity
+from src.infra.adapter.repository.postgres.entity.stock_entity import StockEntity
 from src.infra.adapter.repository.postgres.entity.user_entity import UserEntity
 from src.infra.adapter.repository.postgres.repository_manager import RepositoryManager
 from src.infra.config.open_tracing_config import tracer
 from src.infra.exception.not_found_exception import NotFoundException
+from src.infra.util.constants import DEFAULT_USER_STOCK_AMOUNT
 
 
 class UserRepository:
@@ -38,6 +41,24 @@ class UserRepository:
                 )
                 repository_manager.add(user_entity)
                 repository_manager.commit()
+
+                ## TODO: Mock data for user stock initializing - Start
+                stock_entities = (
+                    repository_manager.query(StockEntity)
+                    .filter(StockEntity.deleted.is_(False))
+                    .all()
+                )
+                for stock_entity in stock_entities:
+                    user_stock_entity = UserStockEntity(
+                        user_id=user_entity.id,
+                        stock_symbol=stock_entity.symbol,
+                        amount=DEFAULT_USER_STOCK_AMOUNT,
+                        price=stock_entity.first_price * DEFAULT_USER_STOCK_AMOUNT,
+                    )
+                    repository_manager.add(user_stock_entity)
+                    repository_manager.commit()
+
+                ## TODO: Mock data for user stock initializing - End
                 return CreateUserOutputModel(id=user_entity.id)
 
     def get_user(self, user_id: UUID) -> GetUserOutputModel:
@@ -69,7 +90,9 @@ class UserRepository:
                     **user_entity.__dict__,
                     orders=orders,
                     stocks=[
-                        GetUserStockOutputModel(**stock_item.__dict__)
+                        GetUserStockOutputModel(
+                            **stock_item.__dict__, total_price=stock_item.price
+                        )
                         for stock_item in user_entity.user_stocks
                     ],
                 )
