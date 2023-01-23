@@ -1,9 +1,13 @@
+from typing import Optional, List
+from uuid import UUID
+
 from opentracing_instrumentation import get_current_span
 
 from src.core.model.base_models.order_status import OrderStatusEnum
 from src.core.model.base_models.order_type import OrderTypeEnum
 from src.core.model.order.buy_order_input_model import BuyOrderInputModel
 from src.core.model.order.cancel_order_input_model import CancelOrderInputModel
+from src.core.model.order.get_order_output_model import GetOrderOutputModel
 from src.core.model.order.order_result_output_model import (
     OrderRepositoryResultOutputModel,
 )
@@ -141,3 +145,54 @@ class OrderRepository:
                     order_result_model.error_code = 2010
 
                 return order_result_model
+
+    def get_orders(self, user_id: Optional[UUID]) -> List[GetOrderOutputModel]:
+        with tracer.start_active_span(
+            "OrderRepository-get_orders",
+            child_of=get_current_span(),
+        ) as scope:
+            scope.span.set_tag(
+                "user_id",
+                user_id,
+            )
+            with RepositoryManager() as repository_manager:
+                filters = []
+                if user_id is not None:
+                    filters.append(OrderEntity.user_id == user_id)
+
+                order_entities = (
+                    repository_manager.query(OrderEntity)
+                    .filter(*filters)
+                    .filter(OrderEntity.deleted.is_(False))
+                    .order_by(OrderEntity.created_at.desc())
+                    .all()
+                )
+
+                result = [
+                    GetOrderOutputModel(**order_entity.__dict__)
+                    for order_entity in order_entities
+                ]
+
+                return result
+
+    def get_order(self, order_id: UUID) -> GetOrderOutputModel:
+        with tracer.start_active_span(
+            "OrderRepository-get_order",
+            child_of=get_current_span(),
+        ) as scope:
+            scope.span.set_tag(
+                "order_id",
+                order_id,
+            )
+            with RepositoryManager() as repository_manager:
+                order_entity = (
+                    repository_manager.query(OrderEntity)
+                    .filter(OrderEntity.id == order_id)
+                    .filter(OrderEntity.deleted.is_(False))
+                    .first()
+                )
+
+                if order_entity is None:
+                    raise NotFoundException(error_code=2011)
+
+                return GetOrderOutputModel(**order_entity.__dict__)

@@ -5,6 +5,7 @@ from src.infra.config.dependency_injection_config import (
     get_user_repository,
     get_order_event_publisher,
     get_stock_repository,
+    get_order_repository,
 )
 
 
@@ -17,6 +18,7 @@ def get_user_service():
 def get_order_service():
     return OrderService(
         order_event_publish_port=get_order_event_publisher(),
+        order_repository_port=get_order_repository(),
     )
 
 
