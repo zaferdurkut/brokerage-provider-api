@@ -3,8 +3,8 @@ from kafka.errors import NoBrokersAvailable
 
 from src.infra.config.app_config import (
     KAFKA_ORDER_TOPIC,
-    KAFKA_SERVERS,
     KAFKA_NOTIFICATION_TOPIC,
+    KAFKA_CONSUMER_SERVERS,
 )
 from src.infra.config.logging_config import get_logger
 from src.infra.exception.infra_exception import InfraException
@@ -16,7 +16,7 @@ def initialize_order_consumer():
     try:
         return kafka.KafkaConsumer(
             KAFKA_ORDER_TOPIC,
-            bootstrap_servers=KAFKA_SERVERS,
+            bootstrap_servers=KAFKA_CONSUMER_SERVERS,
         )
     except NoBrokersAvailable as exc:
         logger.critical(str(exc))
@@ -30,7 +30,7 @@ def initialize_notification_consumer():
     try:
         return kafka.KafkaConsumer(
             KAFKA_NOTIFICATION_TOPIC,
-            bootstrap_servers=KAFKA_SERVERS,
+            bootstrap_servers=KAFKA_CONSUMER_SERVERS,
         )
     except NoBrokersAvailable as exc:
         logger.critical(str(exc))

@@ -179,7 +179,7 @@ def cancel_order(
 )
 def get_orders(
     request: Request,
-    user_id: Optional[UUID] = Query(None, example=uuid4()),
+    user_id: Optional[UUID] = Query(None),
     order_service=Depends(get_order_service),
 ):
     span_ctx = tracer.extract(Format.HTTP_HEADERS, request.headers)
