@@ -22,8 +22,8 @@ from src.infra.exception.not_found_exception import NotFoundException
 
 def create_app():
     app = FastAPI(
-        title="Stock Exchange API",
-        description="The API for the stock exchange operations",
+        title="Brokerage Provider API",
+        description="The API for the brokerage provider operations",
         version="0.1.0",
         openapi_url="/openapi.json",
         docs_url="/",

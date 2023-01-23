@@ -1,4 +1,4 @@
-## Stock Exchange Service
+## Brokerage Provider Service
 ### Build and run the app
 
 From your project directory, start up your application by running
