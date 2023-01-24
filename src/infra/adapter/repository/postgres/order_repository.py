@@ -2,6 +2,7 @@ from typing import Optional, List
 from uuid import UUID
 
 from opentracing_instrumentation import get_current_span
+from sqlalchemy import func
 
 from src.core.model.base_models.order_status import OrderStatusEnum
 from src.core.model.base_models.order_type import OrderTypeEnum
@@ -52,8 +53,24 @@ class OrderRepository:
 
                     user_entity = self._get_user(user_id=buy_order_input_model.user_id)
 
-                    print(order_entity.amount, order_entity.price, user_entity.balance)
-                    if order_entity.amount * order_entity.price > user_entity.balance:
+                    waiting_order_entities = (
+                        repository_manager.query(
+                            func.sum(OrderEntity.amount).label("total_waiting_amount")
+                        )
+                        .filter(OrderEntity.user_id == buy_order_input_model.user_id)
+                        .filter(
+                            OrderEntity.stock_symbol
+                            == buy_order_input_model.stock_symbol
+                        )
+                        .filter(OrderEntity.status == OrderStatusEnum.WAITING)
+                        .filter(OrderEntity.deleted.is_(False))
+                        .first()
+                    )
+
+                    if (
+                        order_entity.amount
+                        + waiting_order_entities.total_waiting_amount
+                    ) * order_entity.price > user_entity.balance:
                         order_result_model.status = OrderStatusEnum.FAILED
                         order_result_model.error_code = 2006
 
@@ -93,14 +110,32 @@ class OrderRepository:
                         status=OrderStatusEnum.WAITING,
                     )
 
+                    waiting_order_entities = (
+                        repository_manager.query(
+                            func.sum(OrderEntity.amount).label("total_waiting_amount")
+                        )
+                        .filter(OrderEntity.user_id == sell_order_input_model.user_id)
+                        .filter(
+                            OrderEntity.stock_symbol
+                            == sell_order_input_model.stock_symbol
+                        )
+                        .filter(OrderEntity.status == OrderStatusEnum.WAITING)
+                        .filter(OrderEntity.deleted.is_(False))
+                        .first()
+                    )
+
                     user_entity = self._get_user(user_id=sell_order_input_model.user_id)
 
                     user_stock_amount = self._get_user_stock_amount(
                         user_id=user_entity.id,
                         stock_symbol=sell_order_input_model.stock_symbol,
                     )
-                    print(order_entity.amount, user_stock_amount)
-                    if order_entity.amount > user_stock_amount:
+
+                    if (
+                        order_entity.amount
+                        + waiting_order_entities.total_waiting_amount
+                        > user_stock_amount
+                    ):
                         order_result_model.status = OrderStatusEnum.FAILED
                         order_result_model.error_code = 2007
 
