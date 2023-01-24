@@ -52,6 +52,7 @@ Notification Service location is **src/infra/adapter/consumer/kafka/notification
 - Database connections manages with ORM (Sqlalchemy python library)
 - Logging manages with python logging package as singleton configuration
 - Database connection works with singleton design pattern principle
+- Error handling works with integer error codes. Error messages are in **src/infra/util/errors.py:1**
 
 
 ## Building and running the application
