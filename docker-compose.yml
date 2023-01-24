@@ -152,5 +152,7 @@ services:
       - .:/app
     depends_on:
       - application
+      - order_consumer
+      - notification_consumer
     command: bash -c "/wait-for-it.sh application:80 -t 60 --strict -- pytest -c pytest.ini -vv --cov --cov-report=html:coverage-reports/coverage-api.html tests/"
 

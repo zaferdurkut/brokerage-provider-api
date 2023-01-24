@@ -53,23 +53,13 @@ class OrderRepository:
 
                     user_entity = self._get_user(user_id=buy_order_input_model.user_id)
 
-                    waiting_order_entities = (
-                        repository_manager.query(
-                            func.sum(OrderEntity.amount).label("total_waiting_amount")
-                        )
-                        .filter(OrderEntity.user_id == buy_order_input_model.user_id)
-                        .filter(
-                            OrderEntity.stock_symbol
-                            == buy_order_input_model.stock_symbol
-                        )
-                        .filter(OrderEntity.status == OrderStatusEnum.WAITING)
-                        .filter(OrderEntity.deleted.is_(False))
-                        .first()
+                    total_waiting_amount = self._get_total_waiting_amount(
+                        user_id=buy_order_input_model.user_id,
+                        stock_symbol=buy_order_input_model.stock_symbol,
                     )
 
                     if (
-                        order_entity.amount
-                        + waiting_order_entities.total_waiting_amount
+                        order_entity.amount + total_waiting_amount
                     ) * order_entity.price > user_entity.balance:
                         order_result_model.status = OrderStatusEnum.FAILED
                         order_result_model.error_code = 2006
@@ -78,6 +68,7 @@ class OrderRepository:
                     order_entity.status = order_result_model.status
                     repository_manager.add(order_entity)
                     repository_manager.commit()
+                    order_result_model.order_id = order_entity.id
                 except Exception as exc:
                     logger.error(str(exc))
                     order_result_model.error_code = 2008
@@ -110,20 +101,6 @@ class OrderRepository:
                         status=OrderStatusEnum.WAITING,
                     )
 
-                    waiting_order_entities = (
-                        repository_manager.query(
-                            func.sum(OrderEntity.amount).label("total_waiting_amount")
-                        )
-                        .filter(OrderEntity.user_id == sell_order_input_model.user_id)
-                        .filter(
-                            OrderEntity.stock_symbol
-                            == sell_order_input_model.stock_symbol
-                        )
-                        .filter(OrderEntity.status == OrderStatusEnum.WAITING)
-                        .filter(OrderEntity.deleted.is_(False))
-                        .first()
-                    )
-
                     user_entity = self._get_user(user_id=sell_order_input_model.user_id)
 
                     user_stock_amount = self._get_user_stock_amount(
@@ -131,11 +108,12 @@ class OrderRepository:
                         stock_symbol=sell_order_input_model.stock_symbol,
                     )
 
-                    if (
-                        order_entity.amount
-                        + waiting_order_entities.total_waiting_amount
-                        > user_stock_amount
-                    ):
+                    total_waiting_amount = self._get_total_waiting_amount(
+                        user_id=sell_order_input_model.user_id,
+                        stock_symbol=sell_order_input_model.stock_symbol,
+                    )
+
+                    if order_entity.amount + total_waiting_amount > user_stock_amount:
                         order_result_model.status = OrderStatusEnum.FAILED
                         order_result_model.error_code = 2007
 
@@ -143,6 +121,7 @@ class OrderRepository:
                     order_entity.status = order_result_model.status
                     repository_manager.add(order_entity)
                     repository_manager.commit()
+                    order_result_model.order_id = order_entity.id
                 except Exception as exc:
                     logger.error(str(exc))
                     order_result_model.error_code = 2009
@@ -191,6 +170,8 @@ class OrderRepository:
                         order_entity.status = order_result_model.status
                         repository_manager.merge(order_entity)
                         repository_manager.commit()
+
+                    order_result_model.user_id = order_entity.user_id
 
                 except NotFoundException as exc:
                     logger.error(str(exc))
@@ -278,3 +259,23 @@ class OrderRepository:
                 return 0
 
             return user_stock_entity.amount
+
+    def _get_total_waiting_amount(self, user_id: UUID, stock_symbol: str):
+        with RepositoryManager() as repository_manager:
+            waiting_order_entities = (
+                repository_manager.query(
+                    func.sum(OrderEntity.amount).label("total_waiting_amount")
+                )
+                .filter(OrderEntity.user_id == user_id)
+                .filter(OrderEntity.stock_symbol == stock_symbol)
+                .filter(OrderEntity.status == OrderStatusEnum.WAITING)
+                .filter(OrderEntity.deleted.is_(False))
+                .first()
+            )
+
+            total_waiting_amount = waiting_order_entities.total_waiting_amount
+
+            if total_waiting_amount is None:
+                total_waiting_amount = 0
+
+            return total_waiting_amount

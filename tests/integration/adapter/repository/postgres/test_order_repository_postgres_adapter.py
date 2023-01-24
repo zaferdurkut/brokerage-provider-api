@@ -1,3 +1,4 @@
+from time import sleep
 from uuid import uuid4
 
 import pytest
@@ -18,6 +19,7 @@ from src.infra.adapter.repository.postgres.repository_manager import RepositoryM
 from tests.integration.controller.order.test_constants import (
     ORDER_CONTROLLER_SELL_PATH,
     ORDER_CONTROLLER_BASE_PATH,
+    ORDER_WAITING_TIME,
 )
 from tests.integration.controller.order.test_input import (
     populate_user_id_and_stock,
@@ -150,6 +152,8 @@ class TestOrderRepositoryPostgresAdapter:
             data=sell_order_input_dto.json(),
         )
         assert sell_order_response.status_code == status.HTTP_202_ACCEPTED
+
+        sleep(ORDER_WAITING_TIME)
 
         get_orders_response: Response = test_client.get(
             ORDER_CONTROLLER_BASE_PATH,
