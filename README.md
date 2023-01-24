@@ -97,7 +97,7 @@ docker-compose -f docker-compose.yml run tests
 
 
 ### Database Structure
-- Database migration manages with alembic python library
+- Database migration manages with alembic python library (https://alembic.sqlalchemy.org/en/latest/)
 - Migration versions are in the **migrations/versions** folder
 
 ![db](resources/documentation/db.png)
@@ -139,7 +139,6 @@ docker-compose -f docker-compose.yml run tests
 
 
 ### Client Order Event Notification at Telegram
-- **URL :** http://localhost:16686/
 
 ![telegram](resources/documentation/telegram.png)
 
