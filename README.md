@@ -104,6 +104,7 @@ docker-compose -f docker-compose.yml run tests
 ### Test Coverage of Project
 - Test files are in tests folder. Also, you can reach test coverage report  after running of tests from **coverage-reports/coverage-api.html/index.html** file
 
+![test_results](resources/documentation/test_results.png)
 ![test_coverage_report](resources/documentation/test_coverage_report.png)
 
 
