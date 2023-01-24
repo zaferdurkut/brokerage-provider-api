@@ -10,7 +10,8 @@ Brokerage Provider API project represents simulates a brokerage provider.
 ### Perspective
 
 - The project design works with docker containers by using docker compose (all system items works with the docker)
-- The project programming language is Python. Services coded with Python programming language
+- The project programming language is Python. Services coded with Python programming language.
+- Rest API framework is FastAPI (https://fastapi.tiangolo.com/). Swagger and OpenAPI documentation are automatically generated with FastAPI.
 - Storing of data uses PostgreSQL database
 - Kafka uses for messaging queue 
 - Redis uses for caching
