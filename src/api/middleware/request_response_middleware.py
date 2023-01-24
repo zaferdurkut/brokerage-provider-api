@@ -1,5 +1,6 @@
 import time
 import uuid
+from datetime import datetime
 
 from fastapi import Request, Response
 
@@ -68,7 +69,7 @@ class RequestResponseMiddleware(BaseHTTPMiddleware):
 
         elapsed_ms = int((time.time() - request.state.start_time) * 1000)
         http_status_code = response.status_code
-        log_template = "{0} | {1} | {2} | {3}ms"
+        log_template = " {4} | {0} | {1} | {2} | {3}ms"
 
         if b"user-agent" in dict(request.headers.raw):
             user_agent = str(dict(request.headers.raw)[b"user-agent"], "utf-8")
@@ -95,6 +96,7 @@ class RequestResponseMiddleware(BaseHTTPMiddleware):
                         request.method,
                         http_status_code,
                         elapsed_ms,
+                        str(datetime.utcnow()),
                     ),
                     log_data,
                 )
@@ -106,6 +108,7 @@ class RequestResponseMiddleware(BaseHTTPMiddleware):
                         request.method,
                         http_status_code,
                         elapsed_ms,
+                        datetime.utcnow(),
                     ),
                     log_data,
                 )
@@ -118,6 +121,7 @@ class RequestResponseMiddleware(BaseHTTPMiddleware):
                         request.method,
                         http_status_code,
                         elapsed_ms,
+                        datetime.utcnow(),
                     ),
                     log_data,
                 )
