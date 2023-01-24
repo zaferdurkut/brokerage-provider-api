@@ -22,6 +22,7 @@ errors = {
     2013: "Order cancel request did not complete with the given order id because of the order was failed",
     2014: "Order cancel request did not complete with the given order id because of the order was canceled",
     2015: "Publish event unexpected error for NotificationEventProducer",
+    2016: "Unexpected error for sending telegram notification",
 }
 
 SYSYEM_ERROR_CODES = [2008, 2009, 2010]

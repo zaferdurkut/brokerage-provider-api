@@ -56,6 +56,7 @@ class OrderRepository:
                     total_waiting_amount = self._get_total_waiting_amount(
                         user_id=buy_order_input_model.user_id,
                         stock_symbol=buy_order_input_model.stock_symbol,
+                        order_type=OrderTypeEnum.BUY,
                     )
 
                     if (
@@ -111,6 +112,7 @@ class OrderRepository:
                     total_waiting_amount = self._get_total_waiting_amount(
                         user_id=sell_order_input_model.user_id,
                         stock_symbol=sell_order_input_model.stock_symbol,
+                        order_type=OrderTypeEnum.SELL,
                     )
 
                     if order_entity.amount + total_waiting_amount > user_stock_amount:
@@ -172,6 +174,7 @@ class OrderRepository:
                         repository_manager.commit()
 
                     order_result_model.user_id = order_entity.user_id
+                    order_result_model.order_id = order_entity.id
 
                 except NotFoundException as exc:
                     logger.error(str(exc))
@@ -260,7 +263,9 @@ class OrderRepository:
 
             return user_stock_entity.amount
 
-    def _get_total_waiting_amount(self, user_id: UUID, stock_symbol: str):
+    def _get_total_waiting_amount(
+        self, user_id: UUID, stock_symbol: str, order_type: OrderTypeEnum
+    ):
         with RepositoryManager() as repository_manager:
             waiting_order_entities = (
                 repository_manager.query(
@@ -269,6 +274,7 @@ class OrderRepository:
                 .filter(OrderEntity.user_id == user_id)
                 .filter(OrderEntity.stock_symbol == stock_symbol)
                 .filter(OrderEntity.status == OrderStatusEnum.WAITING)
+                .filter(OrderEntity.type == order_type)
                 .filter(OrderEntity.deleted.is_(False))
                 .first()
             )
